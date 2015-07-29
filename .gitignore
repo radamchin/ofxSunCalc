@@ -1,0 +1,20 @@
+# No apps yo
+**/*.app
+
+#Death to user data
+**/*.xcodeproj/xcuserdata/*
+**.xcuserstate
+
+**.zip
+**.log
+
+#Windows VS specific stuff
+*.exp
+*.ilk
+*.lib
+*.dll
+**/obj/Debug
+**/obj/Release
+/projectGenerator
+*.sdf
+*.opensdf
