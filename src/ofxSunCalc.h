@@ -52,6 +52,10 @@ typedef struct {
     
     SunCalcDayInfoExtended extended;
     
+    double lat;
+    double lon;
+    
+    
 } SunCalcDayInfo;
 
 class ofxSunCalc {
@@ -171,8 +175,8 @@ class ofxSunCalc {
             return Jtransit - (Jset - Jtransit);
         }
     
-        SunCalcPosition getSunPosition( const Poco::LocalDateTime & date, double lat, double lng ) {
-            return getSunPosition( dateToJulianDate(date), -lng * deg2rad, lat * deg2rad );
+        SunCalcPosition getSunPosition( const Poco::LocalDateTime & date, double lat, double lon ) {
+            return getSunPosition( dateToJulianDate(date), -lon * deg2rad, lat * deg2rad );
         }
     
         SunCalcPosition getSunPosition( double J, double lw, double phi ) {
@@ -189,8 +193,8 @@ class ofxSunCalc {
             return pos;
         }
     
-        SunCalcDayInfo getDayInfo( const Poco::LocalDateTime & date, double lat, double lng, bool detailed = false ) {
-            double lw = -lng * deg2rad;
+        SunCalcDayInfo getDayInfo( const Poco::LocalDateTime & date, double lat, double lon, bool detailed = false ) {
+            double lw = -lon * deg2rad;
             double phi = lat * deg2rad;
             double J = dateToJulianDate(date);
         
@@ -212,6 +216,9 @@ class ofxSunCalc {
             double Jciv2 = getSunriseJulianDate(Jtransit, Jnau);
         
             SunCalcDayInfo info;
+            
+            info.lat = lat;
+            info.lon = lon;
             
             info.dawn = julianDateToDate(Jciv2);
             info.sunrise.start = julianDateToDate(Jrise);

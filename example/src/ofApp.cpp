@@ -9,10 +9,10 @@
  
     TODO:  
         * Show the azimuth postition (angle of sun)
+        * Sun rise / set position in sky (against horizon?)
         * Draw and extended timeline
  
  */
-
 
 //--------------------------------------------------------------
 void ofApp::setup(){

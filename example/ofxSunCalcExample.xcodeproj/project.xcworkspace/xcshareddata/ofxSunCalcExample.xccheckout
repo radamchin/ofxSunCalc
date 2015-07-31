@@ -22,7 +22,7 @@
 		<key>97E8BB9CE77AA2093434726D47C29DE2DAF59DDC</key>
 		<string>../../..</string>
 		<key>B513103D718E432C5C773DE513FD5BB46E07A827</key>
-		<string>../../../../..</string>
+		<string>../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/radamchin/ofxSunCalc.git</string>
@@ -38,7 +38,7 @@
 			<key>IDESourceControlWCCIdentifierKey</key>
 			<string>B513103D718E432C5C773DE513FD5BB46E07A827</string>
 			<key>IDESourceControlWCCName</key>
-			<string>..</string>
+			<string></string>
 		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
