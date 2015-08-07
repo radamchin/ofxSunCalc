@@ -70,7 +70,7 @@ void ofApp::setup(){
     for(int i = 0; i<4; i++) {
         timelines.push_back(ofFbo());
         timelines[i].allocate(ofGetWidth() - 20 - 110, 32);
-        ofxSunCalc::drawSimpleDayInfoTimeline(timelines[i], sun_infos[i], small_font);
+        ofxSunCalc::drawSimpleDayInfoTimeline(timelines[i], sun_infos[i]);
     }
 
 }

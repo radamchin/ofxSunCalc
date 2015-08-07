@@ -31,9 +31,10 @@ class ofApp : public ofBaseApp{
         
         vector<ofFbo> timelines;
         vector<string> labels;
-        ofTrueTypeFont small_font;
         
         float lat;
         float lon;
+    
+        ofTrueTypeFont small_font;
     
 };
