@@ -259,7 +259,7 @@ float ofxSunCalc::getSunBrightness(SunCalcDayInfo & info, const Poco::LocalDateT
 void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info) {
     
     ofPushStyle();
-    
+    ofPushMatrix();
     float hour_w = target.getWidth() / 24;
     
     float fill_top = 22;
@@ -279,6 +279,8 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
     
     target.begin();
     
+   // ofEnableAlphaBlending();
+    
     ofClear(0,0,0);
     ofSetColor(255);
     ofRect(0,fill_top,target.getWidth(), fill_h);
@@ -288,9 +290,12 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
     
     for(int hr = 0; hr<24; hr++) {
         float cx = (hr*hour_w)+1;
-        ofSetColor(0);
-        ofLine(cx,0,cx,target.getHeight());
         
+        ofSetColor(255);
+        ofLine(cx,0,cx,target.getHeight()); // vertical hour marker
+        
+        // shadowed time label
+        ofSetColor(0);
         ofx_suncalc_font.drawString(ofToString(hr) + ":00", cx + 4, 15);
         ofSetColor(255);
         ofx_suncalc_font.drawString(ofToString(hr) + ":00", cx + 3, 14);
@@ -341,6 +346,8 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
     
     target.end();
     
+   // ofDisableAlphaBlending();
+    ofPopMatrix();
     ofPopStyle();
 }
 

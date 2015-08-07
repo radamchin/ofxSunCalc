@@ -53,7 +53,7 @@ typedef struct {
     SunCalcDayInfoExtended extended;
     
     double lat;
-    double lon;    
+    double lon;
     
 } SunCalcDayInfo;
 
