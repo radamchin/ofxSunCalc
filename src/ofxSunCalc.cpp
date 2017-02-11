@@ -14,7 +14,7 @@ ofxSunCalc::ofxSunCalc() {
     C2 = 0.0200 * deg2rad;
     C3 = 0.0003 * deg2rad;
     P = 102.9372 * deg2rad;
-    e = 23.45 * deg2rad;
+    e = 23.4397 * deg2rad; // obliquity of the Earth
     th0 = 280.1600 * deg2rad;
     th1 = 360.9856235 * deg2rad;
     h0 = -0.83 * deg2rad; //sunset angle
