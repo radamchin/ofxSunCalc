@@ -21,11 +21,6 @@ void ofApp::setup(){
     
     ofSetFrameRate(30);
     
-    Poco::LocalDateTime now;
-    
-    date_str = Poco::DateTimeFormatter::format(now, "%Y-%m-%d %H:%M:%S");
-    ofLogNotice("NOW") << date_str;
-    //ofLogNotice("local tzd") << now.tzd();
     
     // Sydney, Australia
     lat = -33.8647; // Note southern degrees need to be - (not like those from google maps)
@@ -33,18 +28,15 @@ void ofApp::setup(){
     
     latlon_str = "lat:" + ofToString(lat) + ", lon:" + ofToString(lon);
     
+    Poco::LocalDateTime now;
+    
+    updateDebugStrings( now );
+    
+    ofLogNotice("NOW") << date_str;
+    //ofLogNotice("local tzd") << now.tzd();
+    
     ofLogNotice("today") << sun_calc.dateToString(now);
-    
-    SunCalcPosition sunpos = sun_calc.getSunPosition(now, lat, lon);
-    
-    pos_str = "altitude=" + ofToString(sunpos.altitude) + ", azimuth=" + ofToString(sunpos.azimuth * RAD_TO_DEG);
-    
     ofLogNotice("sunpos") << pos_str;
-    
-    todayInfo = sun_calc.getDayInfo(now, lat, lon, true);
-    
-    min_info_str = sun_calc.infoToString(todayInfo, true);
-    max_info_str = sun_calc.infoToString(todayInfo, false);
     ofLogNotice() << min_info_str << endl << endl << max_info_str;
     
     small_font.loadFont(OF_TTF_MONO, 8, false);
@@ -80,6 +72,20 @@ void ofApp::update(){
 
 }
 
+void ofApp::updateDebugStrings( Poco::LocalDateTime &date ) {
+    
+    date_str = Poco::DateTimeFormatter::format(date, "%Y-%m-%d %H:%M:%S");
+    
+    SunCalcPosition sunpos = sun_calc.getSunPosition(date, lat, lon);
+    
+    pos_str = "altitude=" + ofToString(sunpos.altitude) + ", azimuth=" + ofToString(sunpos.azimuth * RAD_TO_DEG);
+    
+    todayInfo = sun_calc.getDayInfo(date, lat, lon, true);
+    
+    min_info_str = sun_calc.infoToString(todayInfo, true);
+    max_info_str = sun_calc.infoToString(todayInfo, false);    
+}
+
 //--------------------------------------------------------------
 void ofApp::draw(){
     
@@ -87,11 +93,14 @@ void ofApp::draw(){
     
     if(ofGetKeyPressed(OF_KEY_ALT)) {
         // auto step the time of day to proof changes
-        int total_min = fabs(sin(ofGetElapsedTimef()*.05)) * 1440; // 1440 == mins per day  60 * 24
+       // int total_min = fabs(sin(ofGetElapsedTimef()*.05)) * 1440;
+        int total_min = (int)((ofGetElapsedTimef()*.05) * 1440) % 1440;// 1440 == mins per day  60 * 24
         int hr = floor(total_min/60.0);
         int mn = total_min - (hr*60); //now.minute();
         now.assign(now.year(), now.month(), now.day(), hr, mn);
     }
+    
+    updateDebugStrings( now );
     
     float sun_brightness = ofxSunCalc::getSunBrightness(todayInfo, now);
     
