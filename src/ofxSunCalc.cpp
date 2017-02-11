@@ -223,7 +223,7 @@ string ofxSunCalc::dateToDateString(const Poco::LocalDateTime & date) {
 }
 
 string ofxSunCalc::dateToTimeString(const Poco::LocalDateTime & date) {
-    return Poco::DateTimeFormatter::format(date, "%H:%M");
+    return Poco::DateTimeFormatter::format(date, "%H:%M:%S");
 }
 
 float ofxSunCalc::getSunBrightness(SunCalcDayInfo & info, const Poco::LocalDateTime time) {
