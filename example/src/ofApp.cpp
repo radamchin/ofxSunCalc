@@ -127,11 +127,11 @@ void ofApp::draw(){
     
     ofDrawBitmapStringHighlight(max_info_str, 15, 125, ofColor::darkorange, ofColor::white);
     
-    ofDrawBitmapStringHighlight(latlon_str, 180, 20, ofColor::gold, ofColor::black);
+    ofDrawBitmapStringHighlight(latlon_str, 195, 20, ofColor::gold, ofColor::black);
     
-    ofDrawBitmapStringHighlight(pos_str, 180, 45, ofColor::cornsilk, ofColor::black);
+    ofDrawBitmapStringHighlight(pos_str, 195, 45, ofColor::cornsilk, ofColor::black);
     
-    ofDrawBitmapStringHighlight("Current Brightness " + ofToString(sun_brightness, 3), 180, 70, ofColor::goldenRod, ofColor::white);
+    ofDrawBitmapStringHighlight("Current Brightness " + ofToString(sun_brightness, 3), 195, 70, ofColor::goldenRod, ofColor::white);
     
     float tx = 10 + 110;
     float ty = 320;
