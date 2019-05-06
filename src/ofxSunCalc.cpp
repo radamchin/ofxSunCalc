@@ -109,6 +109,56 @@ SunCalcPosition ofxSunCalc::getSunPosition( double J, double lw, double phi ) {
     return pos;
 }
 
+double ofxSunCalc::rightAscension(double l, double b) { return atan2(sin(l) * cos(e) - tan(b) * sin(e), cos(l)); }
+double ofxSunCalc::declination(double l, double b){ return asin(sin(b) * cos(e) + cos(b) * sin(e) * sin(l)); }
+double ofxSunCalc::azimuth(double H, double phi, double dec)  { return atan2(sin(H), cos(H) * sin(phi) - tan(dec) * cos(phi)); }
+double ofxSunCalc::altitude(double H, double phi, double dec) { return asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(H)); }
+double ofxSunCalc::siderealTime(double d, double lw) { return deg2rad * (280.16 + 360.9856235 * d) - lw; }
+double ofxSunCalc::astroRefraction(double h) {
+    if (h < 0) // the following formula works for positive altitudes only.
+        h = 0; // if h = -0.08901179 a div/0 would occur.
+    
+    // formula 16.4 of "Astronomical Algorithms" 2nd edition by Jean Meeus (Willmann-Bell, Richmond) 1998.
+    // 1.02 / tan(h + 10.26 / (h + 5.10)) h in degrees, result in arc minutes -> converted to rad:
+    return 0.0002967 / tan(h + 0.00312536 / (h + 0.08901179));
+}
+
+
+MoonCalcPosition ofxSunCalc::getMoonPosition( const Poco::LocalDateTime & date, double lat, double lng){
+    
+    double rad = deg2rad;
+    double lw  = rad * -lng;
+    double phi = rad * lat;
+    double d = dateToJulianDate(date);
+    
+        // function moonCoord(d)
+        double L = rad * (218.316 + 13.176396 * d); // ecliptic longitude
+        double M = rad * (134.963 + 13.064993 * d); // mean anomaly
+        double F = rad * (93.272 + 13.229350 * d);  // mean distance
+        
+        double l = L + rad * 6.289 * sin(M);    // longitude
+        double b = rad * 5.128 * sin(F);        // latitude
+        double dt = 385001 - 20905 * cos(M);    // distance to the moon in km
+        
+        double ra = rightAscension(l, b);
+        double dec = declination(l,b);
+        double dist = dt;
+    
+    double H = siderealTime(d, lw) - ra;
+    double h = altitude(H, phi, dec);
+    
+    // formula 14.1 of "Astronomical Algorithms" 2nd edition by Jean Meeus (Willmann-Bell, Richmond) 1998.
+    double pa = atan2(sin(H), tan(phi) * cos(dec) - sin(dec) * cos(H));
+    h = h + astroRefraction(h); // altitude correction for refraction
+
+    MoonCalcPosition mp;
+    mp.azimuth =  azimuth(H, phi, dec);
+    mp.altitude =  h;
+    mp.distance = dist;
+    mp.parallacticAngle = pa;
+    return mp;
+}
+
 SunCalcDayInfo ofxSunCalc::getDayInfo( const Poco::LocalDateTime & date, double lat, double lon, bool detailed ) {
     double lw = -lon * deg2rad;
     double phi = lat * deg2rad;
@@ -205,7 +255,7 @@ string ofxSunCalc::infoToString(const SunCalcDayInfo & info, bool min ) {
         out << dateToTimeString(info.extended.nightTwilightCivil.start) << "-" << dateToTimeString(info.extended.nightTwilightCivil.end) << " - civil twilight" << endl;
         out << dateToTimeString(info.extended.nightTwilightNautical.start) << "-" << dateToTimeString(info.extended.nightTwilightNautical.end) << " - nautical twilight" << endl;
         out << dateToTimeString(info.extended.nightTwilightAstronomical.start) << "-" << dateToTimeString(info.extended.nightTwilightAstronomical.end) << " - astronomical twilight" << endl;
-        out << dateToTimeString(info.extended.nightTwilightAstronomical.end) << "-00:00 - night" << endl;
+        out << dateToTimeString(info.extended.nightTwilightAstronomical.end) << "-00:00:00 - night" << endl;
         
         out << dateToDateString(info.extended.morningTwilightAstronomical.start) << " - " << dateToDateString(info.extended.nightTwilightAstronomical.end) << " - date range";
     }
