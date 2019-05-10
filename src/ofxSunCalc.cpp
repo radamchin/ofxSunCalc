@@ -324,7 +324,7 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
     
     static ofTrueTypeFont ofx_suncalc_font;
     if(!ofx_suncalc_font.isLoaded()) {
-        ofx_suncalc_font.loadFont(OF_TTF_MONO, 8, false);
+        ofx_suncalc_font.load(OF_TTF_MONO, 8, false);
     }
     
     target.begin();
@@ -333,7 +333,7 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
     
     ofClear(0,0,0);
     ofSetColor(255);
-    ofRect(0,fill_top,target.getWidth(), fill_h);
+    ofDrawRectangle(0,fill_top,target.getWidth(), fill_h);
     
     ofNoFill();
     ofSetLineWidth(1.0);
@@ -342,7 +342,7 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
         float cx = (hr*hour_w)+1;
         
         ofSetColor(255);
-        ofLine(cx,0,cx,target.getHeight()); // vertical hour marker
+        ofDrawLine(cx,0,cx,target.getHeight()); // vertical hour marker
         
         // shadowed time label
         ofSetColor(0);
@@ -364,35 +364,35 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
     tw = pixels_per_min*dawn_mins;
     
     ofSetColor(nightCol);
-    ofRect(tx, fill_top, tw, fill_h);
+    ofDrawRectangle(tx, fill_top, tw, fill_h);
     tx += tw;
     
     // Sunrise (twilight) : info.dawn -> info.sunrise.end;
     tw = (pixels_per_min * (info.sunrise.end.hour() * 60 + info.sunrise.end.minute())) - tx;
     
     ofSetColor(twilightCol);
-    ofRect(tx, fill_top, tw, fill_h);
+    ofDrawRectangle(tx, fill_top, tw, fill_h);
     tx += tw;
     
     // Day : info.sunrise.end -> info.sunset.start
     tw = (pixels_per_min * (info.sunset.start.hour() * 60 + info.sunset.start.minute())) - tx;
     
     ofSetColor(dayCol);
-    ofRect(tx, fill_top, tw, fill_h);
+    ofDrawRectangle(tx, fill_top, tw, fill_h);
     tx += tw;
     
     // Sunset (twilight) : info.sunset.start -> info.dusk
     tw = (pixels_per_min * (info.dusk.hour() * 60 + info.dusk.minute())) - tx;
     
     ofSetColor(twilightCol);
-    ofRect(tx, fill_top, tw, fill_h);
+    ofDrawRectangle(tx, fill_top, tw, fill_h);
     tx += tw;
     
     // Evening night : info.dusk -> 24:00
     tw = target.getWidth() - tx;
     
     ofSetColor(nightCol);
-    ofRect(tx, fill_top, tw, fill_h);
+    ofDrawRectangle(tx, fill_top, tw, fill_h);
     
     target.end();
     
