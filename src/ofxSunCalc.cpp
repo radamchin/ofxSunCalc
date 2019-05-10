@@ -2,26 +2,6 @@
 #include "ofxSunCalc.h"
 
 ofxSunCalc::ofxSunCalc() {
-    J1970 = 2440588;
-    J2000 = 2451545;
-    deg2rad = PI / 180.0;
-    M0 = 357.5291 * deg2rad;
-    M1 = 0.98560028 * deg2rad;
-    J0 = 0.0009;
-    J1 = 0.0053;
-    J2 = -0.0069;
-    C1 = 1.9148 * deg2rad;
-    C2 = 0.0200 * deg2rad;
-    C3 = 0.0003 * deg2rad;
-    P = 102.9372 * deg2rad;
-    e = 23.4397 * deg2rad; // obliquity of the Earth
-    th0 = 280.1600 * deg2rad;
-    th1 = 360.9856235 * deg2rad;
-    h0 = -0.83 * deg2rad; //sunset angle
-    d0 = 0.53 * deg2rad; //sun diameter
-    h1 = -6 * deg2rad; //nautical twilight angle
-    h2 = -12 * deg2rad; //astronomical twilight angle
-    h3 = -18 * deg2rad; //darkness angle
 }
 
 double ofxSunCalc::dateToJulianDate( const Poco::LocalDateTime & date ) {

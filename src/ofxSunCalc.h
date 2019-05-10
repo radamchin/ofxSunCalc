@@ -126,26 +126,27 @@ private:
 
 private:
     
-    double J1970;
-    double J2000;
-    double deg2rad;
-    double M0;
-    double M1;
-    double J0;
-    double J1;
-    double J2;
-    double C1;
-    double C2;
-    double C3;
-    double P;
-    double e;
-    double th0;
-    double th1;
-    double h0;
-    double d0;
-    double h1;
-    double h2;
-    double h3;
+    constexpr static double J1970 = 2440588;
+    constexpr static double J2000 = 2451545;
+    constexpr static double dayMs = 1000 * 60 * 60 * 24;
+    constexpr static double deg2rad = PI / 180.0;
+    constexpr static double M0 = 357.5291 * deg2rad;
+    constexpr static double M1 = 0.98560028 * deg2rad;
+    constexpr static double J0 = 0.0009;
+    constexpr static double J1 = 0.0053;
+    constexpr static double J2 = -0.0069;
+    constexpr static double C1 = 1.9148 * deg2rad;
+    constexpr static double C2 = 0.0200 * deg2rad;
+    constexpr static double C3 = 0.0003 * deg2rad;
+    constexpr static double P = 102.9372 * deg2rad;
+    constexpr static double e = 23.4397 * deg2rad; // obliquity of the Earth
+    constexpr static double th0 = 280.1600 * deg2rad;
+    constexpr static double th1 = 360.9856235 * deg2rad;
+    constexpr static double h0 = -0.833 * deg2rad; //sunset angle
+    constexpr static double d0 = 0.53 * deg2rad; //sun diameter
+    constexpr static double h1 = -6 * deg2rad; //nautical twilight angle
+    constexpr static double h2 = -12 * deg2rad; //astronomical twilight angle
+    constexpr static double h3 = -18 * deg2rad; //darkness angle
     
 };
 
