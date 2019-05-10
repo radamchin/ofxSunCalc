@@ -9,8 +9,11 @@ double ofxSunCalc::dateToJulianDate( const Poco::LocalDateTime & date ) {
 }
 
 Poco::LocalDateTime ofxSunCalc::julianDateToDate( double j ) {
-    Poco::LocalDateTime d(j);// + 0.5 - J1970);
-    return d;
+    if(!std::isnan(j)){
+        return Poco::LocalDateTime(j); // + 0.5 - J1970);
+    }else{
+        return Poco::LocalDateTime(0,1,1,0,0,0);    // this is error
+    }
 }
 
 int ofxSunCalc::getJulianCycle( double J, double lw ) {
@@ -242,18 +245,28 @@ string ofxSunCalc::infoToString(const SunCalcDayInfo & info, bool min ) {
     return out.str();
 }
 
-
-
 string ofxSunCalc::dateToString(const Poco::LocalDateTime & date) {
-    return Poco::DateTimeFormatter::format(date, "%Y-%m-%d %H:%M:%S");
+    if(date.year() == 0){
+        return "n.a.";
+    }else{
+        return Poco::DateTimeFormatter::format(date, "%Y-%m-%d %H:%M:%S");
+    }
 }
 
 string ofxSunCalc::dateToDateString(const Poco::LocalDateTime & date) {
-    return Poco::DateTimeFormatter::format(date, "%Y-%m-%d");
+    if(date.year() == 0){
+        return "n.a.";
+    }else{
+        return Poco::DateTimeFormatter::format(date, "%Y-%m-%d");
+    }
 }
 
 string ofxSunCalc::dateToTimeString(const Poco::LocalDateTime & date) {
-    return Poco::DateTimeFormatter::format(date, "%H:%M:%S");
+    if(date.year() == 0){
+        return "n.a.";
+    }else{
+        return Poco::DateTimeFormatter::format(date, "%H:%M:%S");
+    }
 }
 
 float ofxSunCalc::getSunBrightness(SunCalcDayInfo & info, const Poco::LocalDateTime time) {
