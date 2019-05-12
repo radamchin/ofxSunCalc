@@ -16,7 +16,7 @@
 
 #include "ofMain.h"
 
-#include "Poco/LocalDateTime.h"
+#include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
 
 typedef struct {
@@ -32,8 +32,8 @@ typedef struct {
 } MoonCalcPosition;
 
 typedef struct {
-    Poco::LocalDateTime start;
-    Poco::LocalDateTime end;
+    Poco::DateTime start;
+    Poco::DateTime end;
 } SunCalcDateRange;
 
 typedef struct {
@@ -51,11 +51,11 @@ typedef struct {
 
 typedef struct {
     
-    Poco::LocalDateTime dawn;
+    Poco::DateTime dawn;
     SunCalcDateRange sunrise;
-    Poco::LocalDateTime transit;
+    Poco::DateTime transit;
     SunCalcDateRange sunset;
-    Poco::LocalDateTime dusk;
+    Poco::DateTime dusk;
     
     SunCalcDayInfoExtended extended;
     
@@ -70,8 +70,8 @@ public:
     
     ofxSunCalc();
     
-    double dateToJulianDate( const Poco::LocalDateTime & date );
-    Poco::LocalDateTime julianDateToDate( double j );
+    double dateToJulianDate( const Poco::DateTime & date );
+    Poco::DateTime julianDateToDate( double j );
     
     int getJulianCycle( double J, double lw );
     
@@ -97,21 +97,21 @@ public:
     
     double getSunriseJulianDate( double Jtransit, double Jset );
     
-    SunCalcPosition getSunPosition( const Poco::LocalDateTime & date, double lat, double lon );
+    SunCalcPosition getSunPosition( const Poco::DateTime & date, double lat, double lon );
     SunCalcPosition getSunPosition( double J, double lw, double phi );
     
-    MoonCalcPosition getMoonPosition( const Poco::LocalDateTime & date, double lat, double lon);
+    MoonCalcPosition getMoonPosition( const Poco::DateTime & date, double lat, double lon);
     
-    SunCalcDayInfo getDayInfo( const Poco::LocalDateTime & date, double lat, double lon, bool detailed = false );
+    SunCalcDayInfo getDayInfo( const Poco::DateTime & date, double lat, double lon, bool detailed = false );
     string infoToString(const SunCalcDayInfo & info, bool min = true);
     
-    string static dateToString(const Poco::LocalDateTime & date);
+    string static dateToString(const Poco::DateTime & date);
     
-    string static dateToDateString(const Poco::LocalDateTime & date);
+    string static dateToDateString(const Poco::DateTime & date);
     
-    string static dateToTimeString(const Poco::LocalDateTime & date);
+    string static dateToTimeString(const Poco::DateTime & date);
     
-    float static getSunBrightness(SunCalcDayInfo & info, const Poco::LocalDateTime time);
+    float static getSunBrightness(SunCalcDayInfo & info, const Poco::DateTime time);
     
     void static drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info);
     void static drawExtendedDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info);

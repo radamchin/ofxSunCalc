@@ -4,15 +4,15 @@
 ofxSunCalc::ofxSunCalc() {
 }
 
-double ofxSunCalc::dateToJulianDate( const Poco::LocalDateTime & date ) {
-    return date.julianDay() - 1.0;// -1 is correction for LocalDateTime being the next day // - 0.5 + J1970;
+double ofxSunCalc::dateToJulianDate( const Poco::DateTime & date ) {
+    return date.julianDay(); // - 1.0; // -1 is correction for DateTime being the next day // - 0.5 + J1970;
 }
 
-Poco::LocalDateTime ofxSunCalc::julianDateToDate( double j ) {
+Poco::DateTime ofxSunCalc::julianDateToDate( double j ) {
     if(!std::isnan(j)){
-        return Poco::LocalDateTime(j); // + 0.5 - J1970);
+        return Poco::DateTime(j); // + 0.5 - J1970);
     }else{
-        return Poco::LocalDateTime(0,1,1,0,0,0);    // this is error
+        return Poco::DateTime(0,1,1,0,0,0);    // this is error
     }
 }
 
@@ -74,7 +74,7 @@ double ofxSunCalc::getSunriseJulianDate( double Jtransit, double Jset ) {
     return Jtransit - (Jset - Jtransit);
 }
 
-SunCalcPosition ofxSunCalc::getSunPosition( const Poco::LocalDateTime & date, double lat, double lon ) {
+SunCalcPosition ofxSunCalc::getSunPosition( const Poco::DateTime & date, double lat, double lon ) {
     return getSunPosition( dateToJulianDate(date), -lon * deg2rad, lat * deg2rad );
 }
 
@@ -107,12 +107,12 @@ double ofxSunCalc::astroRefraction(double h) {
 }
 
 
-MoonCalcPosition ofxSunCalc::getMoonPosition( const Poco::LocalDateTime & date, double lat, double lng){
+MoonCalcPosition ofxSunCalc::getMoonPosition( const Poco::DateTime & date, double lat, double lng){
     
     double rad = deg2rad;
     double lw  = rad * -lng;
     double phi = rad * lat;
-    double d = dateToJulianDate(date);
+    double d = dateToJulianDate(date) - J2000;
     
         // function moonCoord(d)
         double L = rad * (218.316 + 13.176396 * d); // ecliptic longitude
@@ -142,7 +142,7 @@ MoonCalcPosition ofxSunCalc::getMoonPosition( const Poco::LocalDateTime & date, 
     return mp;
 }
 
-SunCalcDayInfo ofxSunCalc::getDayInfo( const Poco::LocalDateTime & date, double lat, double lon, bool detailed ) {
+SunCalcDayInfo ofxSunCalc::getDayInfo( const Poco::DateTime & date, double lat, double lon, bool detailed ) {
     double lw = -lon * deg2rad;
     double phi = lat * deg2rad;
     double J = dateToJulianDate(date);
@@ -245,7 +245,7 @@ string ofxSunCalc::infoToString(const SunCalcDayInfo & info, bool min ) {
     return out.str();
 }
 
-string ofxSunCalc::dateToString(const Poco::LocalDateTime & date) {
+string ofxSunCalc::dateToString(const Poco::DateTime & date) {
     if(date.year() == 0){
         return "n.a.";
     }else{
@@ -253,7 +253,7 @@ string ofxSunCalc::dateToString(const Poco::LocalDateTime & date) {
     }
 }
 
-string ofxSunCalc::dateToDateString(const Poco::LocalDateTime & date) {
+string ofxSunCalc::dateToDateString(const Poco::DateTime & date) {
     if(date.year() == 0){
         return "n.a.";
     }else{
@@ -261,7 +261,7 @@ string ofxSunCalc::dateToDateString(const Poco::LocalDateTime & date) {
     }
 }
 
-string ofxSunCalc::dateToTimeString(const Poco::LocalDateTime & date) {
+string ofxSunCalc::dateToTimeString(const Poco::DateTime & date) {
     if(date.year() == 0){
         return "n.a.";
     }else{
@@ -269,7 +269,7 @@ string ofxSunCalc::dateToTimeString(const Poco::LocalDateTime & date) {
     }
 }
 
-float ofxSunCalc::getSunBrightness(SunCalcDayInfo & info, const Poco::LocalDateTime time) {
+float ofxSunCalc::getSunBrightness(SunCalcDayInfo & info, const Poco::DateTime time) {
 
     // NOTE: this method not scientific, just a linear approximating hack when sun is setting.
     // TODO: do based on position and full twilights,
