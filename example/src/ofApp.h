@@ -20,7 +20,7 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-        void updateDebugStrings( Poco::LocalDateTime &date );
+        void updateDebugStrings( Poco::DateTime &date );
     
         ofxSunCalc sun_calc;
         SunCalcDayInfo todayInfo;
@@ -33,6 +33,8 @@ class ofApp : public ofBaseApp{
         
         vector<ofFbo> timelines;
         vector<string> labels;
+	
+		int tz_offset = 0;
         
         float lat;
         float lon;

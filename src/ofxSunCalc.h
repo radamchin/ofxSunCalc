@@ -36,7 +36,7 @@ typedef struct {
     Poco::DateTime end;
 } SunCalcDateRange;
 
-typedef struct {
+typedef struct SunCalcDayInfoExtended {
     bool isSet = false;
     
     SunCalcDateRange morningTwilightAstronomical;
@@ -102,16 +102,16 @@ public:
     
     MoonCalcPosition getMoonPosition( const Poco::DateTime & date, double lat, double lon);
     
-    SunCalcDayInfo getDayInfo( const Poco::DateTime & date, double lat, double lon, bool detailed = false );
-    string infoToString(const SunCalcDayInfo & info, bool min = true);
+    SunCalcDayInfo getDayInfo( const Poco::DateTime & date, double lat, double lon, bool detailed = false, int tz_offset = 0 );
+    string infoToString(const SunCalcDayInfo & info, bool min = true, int tz_offset = 0);
     
-    string static dateToString(const Poco::DateTime & date);
-    
-    string static dateToDateString(const Poco::DateTime & date);
-    
-    string static dateToTimeString(const Poco::DateTime & date);
-    
-    float static getSunBrightness(SunCalcDayInfo & info, const Poco::DateTime time);
+    string static dateToString(const Poco::DateTime & date, int tz_offset = 0);
+    string static dateToDateString(const Poco::DateTime & date, int tz_offset = 0);
+    string static dateToTimeString(const Poco::DateTime & date, int tz_offset = 0);
+	string static formatDate(const Poco::DateTime & date, const string pattern, int tz_offset = 0 );
+	Poco::DateTime static offsetDate(const Poco::DateTime & date, int tz_offset);
+	
+    float static getSunBrightness(SunCalcDayInfo & info, const Poco::DateTime time, int tz_offset = 0);
     
     void static drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info);
     void static drawExtendedDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info);
