@@ -21,13 +21,20 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
         void updateDebugStrings( Poco::DateTime &date );
-    
+	
+	
+		void circularBackgroundGradient(const ofFloatColor & start, const ofFloatColor & end, glm::vec2 centre );
+		
+		ofVboMesh circularGradientMesh; // for circularBackgroundGradient
+	
         ofxSunCalc sun_calc;
         SunCalcDayInfo todayInfo;
+		SunCalcPosition sun_pos;
         
         string min_info_str;
         string max_info_str;
-        string pos_str;
+        string alt_str;
+		string azi_str;
         string date_str;
         string latlon_str;
         
@@ -40,5 +47,9 @@ class ofApp : public ofBaseApp{
         float lon;
     
         ofTrueTypeFont small_font;
+	
+		ofShader gradientShader;
+
+
     
 };

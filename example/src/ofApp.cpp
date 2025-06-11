@@ -7,7 +7,7 @@
 /*
     ofxSunCalc Example App
  
-    TODO:  
+    TODO:
         * Show the azimuth postition (angle of sun)
         * Sun rise / set position in sky (against horizon?)
         * Draw and extended timeline
@@ -21,7 +21,7 @@ void ofApp::setup(){
     ofSetWindowTitle("ofxSunCalc Example");
     
     ofSetFrameRate(30);
-    
+	
     
     // Sydney, Australia
     lat = -33.8647; // Note southern degrees need to be - (not like those from google maps)
@@ -68,7 +68,19 @@ void ofApp::setup(){
         timelines.push_back(ofFbo());
         timelines[i].allocate(ofGetWidth() - 20 - 110, 32);
         ofxSunCalc::drawSimpleDayInfoTimeline(timelines[i], sun_infos[i]);
-    }
+	
+	
+	if(ofIsGLProgrammableRenderer()) {
+		bool success = gradientShader.load("shaders/GL3/gradient");
+		ofLogNotice("ProgrammableRenderer") << success;
+	}else{
+		bool success = gradientShader.load("shaders/GL2/gradient");
+		ofLogNotice("Non-ProgrammableRenderer") << success;
+	}
+	
+	if (!gradientShader.isLoaded()) {
+		ofLogError() << "Gradient shader failed to load";
+	}
 
 }
 
@@ -77,13 +89,15 @@ void ofApp::update(){
 
 }
 
+//--------------------------------------------------------------
 void ofApp::updateDebugStrings( Poco::DateTime &date ) {
     
 	date_str = Poco::DateTimeFormatter::format(ofxSunCalc::offsetDate(date, tz_offset), "%Y-%m-%d %H:%M:%S");
     
-    SunCalcPosition sunpos = sun_calc.getSunPosition(date, lat, lon);
+	sun_pos = sun_calc.getSunPosition(date, lat, lon);
     
-    pos_str = "altitude=" + ofToString(sunpos.altitude) + ", azimuth=" + ofToString(sunpos.azimuth * RAD_TO_DEG);
+	alt_str = "altitude = " + ofToString(sun_pos.altitude);
+	azi_str = "azimuth =  " + ofToString(sun_pos.azimuth * RAD_TO_DEG);
     
     todayInfo = sun_calc.getDayInfo(date, lat, lon, true, tz_offset);
     
@@ -106,7 +120,6 @@ void ofApp::draw(){
         now.assign(now.year(), now.month(), now.day(), hr, mn);
     }
 	
-	
     updateDebugStrings( now );
     
 	float sun_brightness = ofxSunCalc::getSunBrightness(todayInfo, now, tz_offset);
@@ -115,21 +128,61 @@ void ofApp::draw(){
         sun_brightness = fabs(sin(ofGetElapsedTimef()*.1));
     }
 	
-	Poco::DateTime local_now = ofxSunCalc::offsetDate(now, tz_offset); // bulid local time so we set the marker accordingly.
+	Poco::DateTime local_now = ofxSunCalc::offsetDate(now, tz_offset);
+	// Bulid local time so we set the marker accordingly.
     
-    // draw background gradient based on sun_brightness
-    
+	
+    // Draw background gradient based on sun_brightness
     ofColor nightBG(ofColor::black);
-    ofColor nightFG(64);
+	ofColor nightFG(64);
     
-    ofColor dayBG(ofColor::skyBlue);
-    ofColor dayFG(ofColor::paleGoldenRod);
+	ofColor dayBG(ofColor::deepSkyBlue);
+	ofColor dayFG(ofColor::paleGoldenRod);
     
     ofColor background = nightBG.lerp(dayBG, sun_brightness);
-    ofColor foreground = nightFG.lerp(dayFG, sun_brightness);
+	ofColor midground = nightFG.lerp(dayFG, sun_brightness);
+	ofColor foreground = ofColor::white; // nightFG.lerp(dayFG, sun_brightness);
     
-    ofBackgroundGradient(foreground, background);
-    
+    //ofBackgroundGradient(foreground, background);
+	float w = ofGetWidth();
+	float h = ofGetHeight();
+	float cx = w/2;
+	
+	float sx = cx; // TODO move x based on sun_pos.azimuth, and the lon being the centre of screen
+	sx = cx + (lon + sun_pos.azimuth * RAD_TO_DEG); // TOOD: this not yet working, ask chatgpt for the algorithm
+	
+	float sy = (h * sun_pos.altitude);
+	
+	// TODO: manipulate radi based on brightness etc. too
+	float innerRadius = 50.0;
+	float middleRadius = 300.0;
+	float outerRadius = std::max(ofGetWidth(), ofGetHeight()) * 0.5;
+
+	ofVec2f sunCenterPos(sx, sy); // where on screen to put the sun TODO: link this in with our alititude and x,y for period in the day, east to west (Right to Left)
+	// circularBackgroundGradient(foreground, background, sunGradientPos);
+	
+	//ofLog() << "Colors: fg=" << foreground << ", mg=" << midground << ", bg=" << background;
+	
+	ofSetColor(255);
+	
+	ofFill();
+	
+	gradientShader.begin();
+
+	   gradientShader.setUniform2f("u_resolution", ofGetWidth(), ofGetHeight());
+	   gradientShader.setUniform2f("u_center", sunCenterPos.x, sunCenterPos.y );
+	   gradientShader.setUniform1f("u_innerRadius", innerRadius);
+	   gradientShader.setUniform1f("u_middleRadius", middleRadius);
+	   gradientShader.setUniform1f("u_outerRadius", outerRadius);
+
+	   gradientShader.setUniform3f("u_colorInner", foreground.r / 255.0f, foreground.g / 255.0f, foreground.b / 255.0f);
+	   gradientShader.setUniform3f("u_colorMiddle", midground.r / 255.0f, midground.g / 255.0f, midground.b / 255.0f);
+	   gradientShader.setUniform3f("u_colorOuter", background.r / 255.0f, background.g / 255.0f, background.b / 255.0f);
+
+	   ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+
+	gradientShader.end();
+	
     ofDrawBitmapStringHighlight(date_str, 15, 20, ofColor::paleGoldenRod, ofColor::black);
     
     ofDrawBitmapStringHighlight(min_info_str, 15, 45, ofColor::salmon, ofColor::white);
@@ -138,12 +191,19 @@ void ofApp::draw(){
     
     ofDrawBitmapStringHighlight(latlon_str, 195, 20, ofColor::gold, ofColor::black);
     
-    ofDrawBitmapStringHighlight(pos_str, 195, 45, ofColor::cornsilk, ofColor::black);
+    ofDrawBitmapStringHighlight(alt_str, 195, 45, ofColor::cornsilk, ofColor::black);
+	ofDrawBitmapStringHighlight(azi_str, 195, 60, ofColor::cornsilk, ofColor::black);
     
-    ofDrawBitmapStringHighlight("Current Brightness " + ofToString(sun_brightness, 3), 195, 70, ofColor::goldenRod, ofColor::white);
+    ofDrawBitmapStringHighlight("Brightness " + ofToString(sun_brightness, 3), 195, 80, ofColor::goldenRod, ofColor::white);
     
     float tx = 10 + 110;
-    float ty = 320;
+	
+	float th = timelines[0].getHeight() + 25;
+	
+	float ty = ofGetHeight() - (th * timelines.size()); // start pos. so they are bottom aligned
+	
+	ofDrawBitmapStringHighlight("[Sun Timelines]", 10, ty-10, ofColor::gold, ofColor::black);
+	
     for(int i = 0; i<timelines.size(); i++) {
         
         ofSetColor(255);
@@ -155,7 +215,7 @@ void ofApp::draw(){
 		
             ofNoFill();
             ofSetLineWidth(1.0);
-            ofSetColor(255);
+            ofSetColor(255,0,0);
             ofDrawRectangle(tx, ty, timelines[i].getWidth(), timelines[i].getHeight());
             
             // Draw a current time mark
@@ -166,9 +226,49 @@ void ofApp::draw(){
             ofDrawLine(nx, ty, nx, ty+timelines[i].getHeight());
         }
         
-        ty += timelines[i].getHeight() + 25;
+        ty += th;
     }
     
+}
+
+//--------------------------------------------------------------
+// Take from ofGraphics::
+void ofApp::circularBackgroundGradient(const ofFloatColor & start, const ofFloatColor & end, glm::vec2 center) {
+	
+	float w = ofGetViewportWidth(), h = ofGetViewportHeight();
+	circularGradientMesh.clear();
+	circularGradientMesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+#ifndef TARGET_EMSCRIPTEN
+	#ifdef TARGET_OPENGLES
+	if (ofIsGLProgrammableRenderer()) gradientMesh.setUsage(GL_STREAM_DRAW);
+	#else
+	circularGradientMesh.setUsage(GL_STREAM_DRAW);
+	#endif
+#endif
+
+	// this could be optimized by building a single mesh once, then copying
+	// it and just adding the colors whenever the function is called.
+	
+	circularGradientMesh.addVertex(glm::vec3(center, 0.f));
+	circularGradientMesh.addColor(start);
+	float n = 32; // circular gradient resolution
+	float angleBisector = glm::two_pi<float>() / (n * 2.0);
+	float smallRadius = ofDist(0, 0, w / 2, h / 2);
+	float bigRadius = smallRadius / std::cos(angleBisector);
+	for (int i = 0; i <= n; i++) {
+		float theta = i * glm::two_pi<float>() / n;
+		circularGradientMesh.addVertex(glm::vec3(center + glm::vec2(std::sin(theta), std::cos(theta)) * bigRadius, 0));
+		circularGradientMesh.addColor(end);
+	}
+
+	GLboolean depthMaskEnabled;
+	glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMaskEnabled);
+	glDepthMask(GL_FALSE);
+	circularGradientMesh.draw();
+	if (depthMaskEnabled) {
+		glDepthMask(GL_TRUE);
+	}
+
 }
 
 //--------------------------------------------------------------
