@@ -20,7 +20,7 @@
 #include "Poco/DateTimeFormatter.h"
 
 typedef struct {
-    double azimuth;
+    double azimuth; // The azimuth of the Sun refers to the compass direction from which the sunlight is coming, measured in degrees along the horizon.
     double altitude;
 } SunCalcPosition;
 
@@ -57,7 +57,7 @@ typedef struct {
     SunCalcDateRange sunset;
     Poco::DateTime dusk;
     
-    SunCalcDayInfoExtended extended;
+    SunCalcDayInfoExtended ext;
     
     double lat;
     double lon;
@@ -113,8 +113,8 @@ public:
 	
     float static getSunBrightness(SunCalcDayInfo & info, const Poco::DateTime time, int tz_offset = 0);
     
-    void static drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info);
-    void static drawExtendedDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info);
+    void drawDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info, bool simple = false);
+    // void static drawExtendedDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info);
     
 private:
     double rightAscension(double l, double b);
@@ -148,6 +148,18 @@ private:
     constexpr static double h2 = -12 * deg2rad; //astronomical twilight angle
     constexpr static double h3 = -18 * deg2rad; //darkness angle
     
+	ofColor nightCol = ofColor::darkBlue; // 127, 142, 180
+	
+	ofColor twilightCol = ofColor::mediumPurple;
+	ofColor sunriseCol{254, 237, 127};
+	ofColor dayCol = ofColor::skyBlue; // 254, 215, 127
+	ofColor sunsetCol{254, 215, 127};
+	
+	ofColor transitCol = ofColor::indigo;
+	
+	ofColor twilightAstroCol = ofColor::blueViolet;
+	ofColor twilightNauticalCol = ofColor::mediumOrchid;
+	ofColor twilightCivilCol = ofColor::violet;
 };
 
 #endif /* defined(__ofxSunCalc__) */

@@ -1,8 +1,11 @@
 
 #include "ofxSunCalc.h"
 
+#define SC_GET_MINS(x) ((x).hour() * 60 + (x).minute())
+
 //--------------------------------------------------------------
 ofxSunCalc::ofxSunCalc() {
+	
 	
 }
 
@@ -135,19 +138,19 @@ MoonCalcPosition ofxSunCalc::getMoonPosition( const Poco::DateTime & date, doubl
     double phi = rad * lat;
     double d = dateToJulianDate(date) - J2000;
     
-        // function moonCoord(d)
-        double L = rad * (218.316 + 13.176396 * d); // ecliptic longitude
-        double M = rad * (134.963 + 13.064993 * d); // mean anomaly
-        double F = rad * (93.272 + 13.229350 * d);  // mean distance
-        
-        double l = L + rad * 6.289 * sin(M);    // longitude
-        double b = rad * 5.128 * sin(F);        // latitude
-        double dt = 385001 - 20905 * cos(M);    // distance to the moon in km
-        
-        double ra = rightAscension(l, b);
-        double dec = declination(l,b);
-        double dist = dt;
-    
+	// function moonCoord(d)
+	double L = rad * (218.316 + 13.176396 * d); // ecliptic longitude
+	double M = rad * (134.963 + 13.064993 * d); // mean anomaly
+	double F = rad * (93.272 + 13.229350 * d);  // mean distance
+	
+	double l = L + rad * 6.289 * sin(M);    // longitude
+	double b = rad * 5.128 * sin(F);        // latitude
+	double dt = 385001 - 20905 * cos(M);    // distance to the moon in km
+	
+	double ra = rightAscension(l, b);
+	double dec = declination(l,b);
+	double dist = dt;
+
     double H = siderealTime(d, lw) - ra;
     double h = altitude(H, phi, dec);
     
@@ -209,25 +212,25 @@ SunCalcDayInfo ofxSunCalc::getDayInfo( const Poco::DateTime & date, double lat, 
         double Jnau2 = getSunriseJulianDate(Jtransit, Jastro);
         double Jastro2 = getSunriseJulianDate(Jtransit, Jdark);
         
-        info.extended.isSet = true;
+        info.ext.isSet = true;
         
-        info.extended.morningTwilightAstronomical.start = offsetDate( julianDateToDate(Jastro2), tz_offset );
-        info.extended.morningTwilightAstronomical.end = offsetDate( julianDateToDate(Jnau2), tz_offset );
+        info.ext.morningTwilightAstronomical.start = offsetDate( julianDateToDate(Jastro2), tz_offset );
+        info.ext.morningTwilightAstronomical.end = offsetDate( julianDateToDate(Jnau2), tz_offset );
 
-        info.extended.morningTwilightNautical.start = offsetDate( julianDateToDate(Jnau2), tz_offset );
-        info.extended.morningTwilightNautical.end = offsetDate( julianDateToDate(Jciv2), tz_offset );
+        info.ext.morningTwilightNautical.start = offsetDate( julianDateToDate(Jnau2), tz_offset );
+        info.ext.morningTwilightNautical.end = offsetDate( julianDateToDate(Jciv2), tz_offset );
         
-        info.extended.morningTwilightCivil.start = offsetDate( julianDateToDate(Jciv2), tz_offset );
-        info.extended.morningTwilightCivil.end = offsetDate( julianDateToDate(Jrise), tz_offset );
+        info.ext.morningTwilightCivil.start = offsetDate( julianDateToDate(Jciv2), tz_offset );
+        info.ext.morningTwilightCivil.end = offsetDate( julianDateToDate(Jrise), tz_offset );
       
-        info.extended.nightTwilightCivil.start = offsetDate( julianDateToDate(Jset), tz_offset );
-        info.extended.nightTwilightCivil.end = offsetDate( julianDateToDate(Jnau), tz_offset );
+        info.ext.nightTwilightCivil.start = offsetDate( julianDateToDate(Jset), tz_offset );
+        info.ext.nightTwilightCivil.end = offsetDate( julianDateToDate(Jnau), tz_offset );
         
-        info.extended.nightTwilightNautical.start = offsetDate( julianDateToDate(Jnau), tz_offset );
-        info.extended.nightTwilightNautical.end = offsetDate( julianDateToDate(Jastro), tz_offset );
+        info.ext.nightTwilightNautical.start = offsetDate( julianDateToDate(Jnau), tz_offset );
+        info.ext.nightTwilightNautical.end = offsetDate( julianDateToDate(Jastro), tz_offset );
        
-        info.extended.nightTwilightAstronomical.start = offsetDate( julianDateToDate(Jastro), tz_offset );
-        info.extended.nightTwilightAstronomical.end = offsetDate( julianDateToDate(Jdark), tz_offset );
+        info.ext.nightTwilightAstronomical.start = offsetDate( julianDateToDate(Jastro), tz_offset );
+        info.ext.nightTwilightAstronomical.end = offsetDate( julianDateToDate(Jdark), tz_offset );
 		
     }
     
@@ -247,20 +250,20 @@ string ofxSunCalc::infoToString(const SunCalcDayInfo & info, bool min, int tz_of
         out << endl << dateToTimeString(info.dusk, tz_offset) << " - dusk";
         
     }else{
+		
+        out << "00:00:00 -> " << dateToTimeString(info.ext.morningTwilightAstronomical.start, tz_offset) << " - night" << endl;
+        out << dateToTimeString(info.ext.morningTwilightAstronomical.start, tz_offset) << " -> " << dateToTimeString(info.ext.morningTwilightAstronomical.end, tz_offset) << " - astronomical twilight" << endl;
+        out << dateToTimeString(info.ext.morningTwilightNautical.start, tz_offset) << " -> " << dateToTimeString(info.ext.morningTwilightNautical.end, tz_offset) << " - nautical twilight" << endl;
+        out << dateToTimeString(info.ext.morningTwilightCivil.start, tz_offset) << " -> " << dateToTimeString(info.ext.morningTwilightCivil.end, tz_offset) << " - civil twilight" << endl;
+        out << dateToTimeString(info.sunrise.start, tz_offset) << " -> " << dateToTimeString(info.sunrise.end, tz_offset) << " - sunrise" << endl;
+        out << dateToTimeString(info.sunrise.end, tz_offset) << " -> " << dateToTimeString(info.sunset.start) << " - daylight" << endl;
+        out << dateToTimeString(info.sunset.start, tz_offset) << " -> " << dateToTimeString(info.sunset.end) << " - sunset" << endl;
+        out << dateToTimeString(info.ext.nightTwilightCivil.start, tz_offset) << " -> " << dateToTimeString(info.ext.nightTwilightCivil.end, tz_offset) << " - civil twilight" << endl;
+        out << dateToTimeString(info.ext.nightTwilightNautical.start, tz_offset) << " -> " << dateToTimeString(info.ext.nightTwilightNautical.end, tz_offset) << " - nautical twilight" << endl;
+        out << dateToTimeString(info.ext.nightTwilightAstronomical.start, tz_offset) << " -> " << dateToTimeString(info.ext.nightTwilightAstronomical.end, tz_offset) << " - astronomical twilight" << endl;
+        out << dateToTimeString(info.ext.nightTwilightAstronomical.end, tz_offset) << " -> 00:00:00 - night" << endl;
         
-        out << "00:00-" << dateToTimeString(info.extended.morningTwilightAstronomical.start, tz_offset) << " - night" << endl;
-        out << dateToTimeString(info.extended.morningTwilightAstronomical.start, tz_offset) << "-" << dateToTimeString(info.extended.morningTwilightAstronomical.end, tz_offset) << " - astronomical twilight" << endl;
-        out << dateToTimeString(info.extended.morningTwilightNautical.start, tz_offset) << "-" << dateToTimeString(info.extended.morningTwilightNautical.end, tz_offset) << " - nautical twilight" << endl;
-        out << dateToTimeString(info.extended.morningTwilightCivil.start, tz_offset) << "-" << dateToTimeString(info.extended.morningTwilightCivil.end, tz_offset) << " - civil twilight" << endl;
-        out << dateToTimeString(info.sunrise.start, tz_offset) << "-" << dateToTimeString(info.sunrise.end, tz_offset) << " - sunrise" << endl;
-        out << dateToTimeString(info.sunrise.end, tz_offset) << "-" << dateToTimeString(info.sunset.start) << " - daylight" << endl;
-        out << dateToTimeString(info.sunset.start, tz_offset) << "-" << dateToTimeString(info.sunset.end) << " - sunset" << endl;
-        out << dateToTimeString(info.extended.nightTwilightCivil.start, tz_offset) << "-" << dateToTimeString(info.extended.nightTwilightCivil.end, tz_offset) << " - civil twilight" << endl;
-        out << dateToTimeString(info.extended.nightTwilightNautical.start, tz_offset) << "-" << dateToTimeString(info.extended.nightTwilightNautical.end, tz_offset) << " - nautical twilight" << endl;
-        out << dateToTimeString(info.extended.nightTwilightAstronomical.start, tz_offset) << "-" << dateToTimeString(info.extended.nightTwilightAstronomical.end, tz_offset) << " - astronomical twilight" << endl;
-        out << dateToTimeString(info.extended.nightTwilightAstronomical.end, tz_offset) << "-00:00:00 - night" << endl;
-        
-        out << dateToDateString(info.extended.morningTwilightAstronomical.start, tz_offset) << " - " << dateToDateString(info.extended.nightTwilightAstronomical.end, tz_offset) << " - date range";
+        out << dateToDateString(info.ext.morningTwilightAstronomical.start, tz_offset) << " -> " << dateToDateString(info.ext.nightTwilightAstronomical.end, tz_offset) << " - date range";
     }
     return out.str();
 }
@@ -299,19 +302,22 @@ Poco::DateTime ofxSunCalc::offsetDate(const Poco::DateTime & date, int tz_offset
 //--------------------------------------------------------------
 float ofxSunCalc::getSunBrightness(SunCalcDayInfo & info, const Poco::DateTime time, int tz_offset) {
 
-    // NOTE: this method not scientific, just a linear approximating hack when sun is setting.
+    // NOTE: this method is not scientific, just a linear approximating hack when sun is rising/setting.
+	// could use altitude too for another quick one
     // TODO: do based on position and full twilights,
     
 	Poco::DateTime t = offsetDate(time, tz_offset);
 	
-    int cur_mins = t.hour() * 60 + t.minute();
+	int cur_mins = SC_GET_MINS(t); // t.hour() * 60 + t.minute();
     
-    int rise_start_mins = info.dawn.hour() * 60 + info.dawn.minute();
-    int rise_end_mins = info.sunrise.end.hour() * 60 + info.sunrise.end.minute();
+    // int rise_start_mins = SC_GET_MINS(info.dawn); // info.dawn.hour() * 60 + info.dawn.minute();
+	int rise_start_mins = SC_GET_MINS(info.ext.morningTwilightAstronomical.start); ;
+	int rise_end_mins = SC_GET_MINS(info.sunrise.end);
     
-    int set_start_mins = info.sunset.start.hour() * 60 + info.sunset.start.minute();
-    int set_end_mins = info.dusk.hour() * 60 + info.dusk.minute();
-    
+	int set_start_mins = SC_GET_MINS(info.sunset.start);
+    // int set_end_mins = SC_GET_MINS(info.dusk);
+	int set_end_mins = SC_GET_MINS(info.ext.nightTwilightAstronomical.end);
+	
     // Work out if they are in night or day or a twilight
     
     if(cur_mins >= rise_start_mins && cur_mins <= rise_end_mins) {
@@ -330,7 +336,7 @@ float ofxSunCalc::getSunBrightness(SunCalcDayInfo & info, const Poco::DateTime t
 }
 
 //--------------------------------------------------------------
-void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info) {
+void ofxSunCalc::drawDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info, bool simple) {
     
     ofPushStyle();
     ofPushMatrix();
@@ -338,13 +344,6 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
     
     float fill_top = 22;
     float fill_h = 10;
-    
-    ofColor nightCol(127, 142, 180);
-    ofColor twilightCol(180, 212, 239);
-    ofColor sunriseCol(254, 237, 127);
-    ofColor dayCol(254, 215, 127);
-    ofColor sunsetCol(254, 215, 127);
-    
     
     static ofTrueTypeFont ofx_suncalc_font;
     if(!ofx_suncalc_font.isLoaded()) {
@@ -368,7 +367,7 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
         ofSetColor(255);
         ofDrawLine(cx,0,cx,target.getHeight()); // vertical hour marker
         
-        // shadowed time label
+        // Shadowed time label
         ofSetColor(0);
         ofx_suncalc_font.drawString(ofToString(hr) + ":00", cx + 4, 15);
         ofSetColor(255);
@@ -383,30 +382,62 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
     
     ofFill();
     
+		
     // Morning Night : 0:00 -> info.dawn;
-    int dawn_mins = info.dawn.hour() * 60 + info.dawn.minute();
+    int dawn_mins = SC_GET_MINS(info.dawn);
     tw = pixels_per_min*dawn_mins;
     
     ofSetColor(nightCol);
     ofDrawRectangle(tx, fill_top, tw, fill_h);
     tx += tw;
-    
+	
+	
     // Sunrise (twilight) : info.dawn -> info.sunrise.end;
-	tw = (pixels_per_min * (info.sunrise.end.hour() * 60 + info.sunrise.end.minute())) - tx;
+	tw = pixels_per_min * SC_GET_MINS(info.sunrise.end) - tx;
     
     ofSetColor(twilightCol);
     ofDrawRectangle(tx, fill_top, tw, fill_h);
     tx += tw;
     
+	
+	if(!simple) {
+		// Lets draw the 3 twilghts regions as rects over the top.
+		float tw_x = pixels_per_min * (0 + SC_GET_MINS(info.ext.morningTwilightAstronomical.start));
+		float tw_w = pixels_per_min * SC_GET_MINS(info.ext.morningTwilightAstronomical.end) - tw_x;
+		
+		ofSetColor(twilightAstroCol, .66 * 255);
+		ofDrawRectangle(tw_x, fill_top, tw_w, fill_h);
+		tw_x += tw_w;
+		
+		tw_w = pixels_per_min * SC_GET_MINS(info.ext.morningTwilightNautical.end) - tw_x;
+		
+		ofSetColor(twilightNauticalCol, .66 * 255);
+		ofDrawRectangle(tw_x, fill_top, tw_w, fill_h);
+		tw_x += tw_w;
+		
+		tw_w = pixels_per_min * SC_GET_MINS(info.ext.morningTwilightCivil.end) - tw_x;
+		
+		ofSetColor(twilightCivilCol, .66 * 255);
+		ofDrawRectangle(tw_x, fill_top, tw_w, fill_h);
+	}
+	
+	
     // Day : info.sunrise.end -> info.sunset.start
-    tw = (pixels_per_min * (info.sunset.start.hour() * 60 + info.sunset.start.minute())) - tx;
+    tw = pixels_per_min * SC_GET_MINS(info.sunset.start) - tx;
     
     ofSetColor(dayCol);
     ofDrawRectangle(tx, fill_top, tw, fill_h);
     tx += tw;
     
+	// Draw line that denotes middle of solar day
+	ofSetColor( transitCol );
+	ofSetLineWidth(2.0);
+	float tr_x = pixels_per_min * (SC_GET_MINS(info.transit));
+	ofDrawLine(tr_x, fill_top, tr_x, fill_top+fill_h);
+	
+	
     // Sunset (twilight) : info.sunset.start -> info.dusk
-    tw = (pixels_per_min * (info.dusk.hour() * 60 + info.dusk.minute())) - tx;
+    tw = pixels_per_min * SC_GET_MINS(info.dusk) - tx;
     
     ofSetColor(twilightCol);
     ofDrawRectangle(tx, fill_top, tw, fill_h);
@@ -417,6 +448,28 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
     
     ofSetColor(nightCol);
     ofDrawRectangle(tx, fill_top, tw, fill_h);
+	
+	
+	if(!simple) {
+		// Lets draw the 3 twilghts regions as rects over the top.
+		float tw_x = pixels_per_min * SC_GET_MINS(info.ext.nightTwilightCivil.start);
+		float tw_w = pixels_per_min * SC_GET_MINS(info.ext.nightTwilightCivil.end) - tw_x;
+		
+		ofSetColor(twilightCivilCol, .66 * 255);
+		ofDrawRectangle(tw_x, fill_top, tw_w, fill_h);
+		tw_x += tw_w;
+		
+		tw_w = pixels_per_min * SC_GET_MINS(info.ext.nightTwilightNautical.end) - tw_x;
+		
+		ofSetColor(twilightNauticalCol, .66 * 255);
+		ofDrawRectangle(tw_x, fill_top, tw_w, fill_h);
+		tw_x += tw_w;
+		
+		tw_w = pixels_per_min * SC_GET_MINS(info.ext.nightTwilightAstronomical.end) - tw_x;
+		
+		ofSetColor(twilightAstroCol, .66 * 255);
+		ofDrawRectangle(tw_x, fill_top, tw_w, fill_h);
+	}
     
     target.end();
     
@@ -425,12 +478,5 @@ void ofxSunCalc::drawSimpleDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info
     ofPopStyle();
 }
 
-//--------------------------------------------------------------
-void ofxSunCalc::drawExtendedDayInfoTimeline(ofFbo & target, SunCalcDayInfo & info) {
-	
-    // TODO: draw all extended twilights and details
-    
-    
-}
 
 //--------------------------------------------------------------
